@@ -1,0 +1,23 @@
+{
+  "name": "open-music-api-dicoding",
+  "version": "1.0.0",
+  "description": "first project for passed dicoding academy course",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nanda Wawan K",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "@hapi/hapi": "^20.2.1",
+    "dotenv": "^16.0.0",
+    "eslint": "^8.8.0",
+    "joi": "^17.6.0",
+    "nanoid": "^3.2.0",
+    "node-pg-migrate": "^6.2.1",
+    "pg": "^8.7.3"
+  }
+}
