@@ -4,8 +4,8 @@
   "description": "first project for passed dicoding academy course",
   "main": "index.js",
   "scripts": {
-    "start-dev": "nodemon ./src/server.mjs",
-    "start-prod": "node ./src/server.mjs",
+    "start-dev": "nodemon ./src/server.js",
+    "start-prod": "node ./src/server.js",
     "lint": "eslint ./src",
     "migrate": "node-pg-migrate"
   },
@@ -22,6 +22,7 @@
     "joi": "^17.6.0",
     "nanoid": "^3.2.0",
     "node-pg-migrate": "^6.2.1",
-    "pg": "^8.7.3"
+    "pg": "^8.7.3",
+    "uuid": "^8.3.2"
   }
 }
