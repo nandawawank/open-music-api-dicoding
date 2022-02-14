@@ -5,6 +5,7 @@ const query = require('./query');
 const InvariantError = require('../../../exception/InvariantError');
 const NotFoundError = require('../../../exception/NotFoundError');
 
+const {objectIsEmpty} = require('../../../utils');
 class AlbumsService {
   constructor() {
     this._pool = new pg.Pool();
@@ -45,6 +46,47 @@ class AlbumsService {
               return resolve(result.rows[0].id);
             },
         );
+      });
+    });
+  }
+
+  async editAlbumById(id, payload) {
+    const {name, year} = payload;
+    const updateAt = new Date().toISOString();
+
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) throw reject(new InvariantError('fail', err.message));
+
+        client.query(query.editAlbum, [name, year, updateAt, id],
+            (err, result) => {
+              done();
+
+              if (err) throw reject(new InvariantError('fail', err.message));
+              // eslint-disable-next-line max-len
+              if (result.rowCount === 0) return reject(new NotFoundError('fail', `${id} not found`));
+              return resolve(result.rows[0].id);
+            });
+      });
+    });
+  }
+
+  async deleteAlbumById(id) {
+    const album = await this.getAlbumById(id);
+    // eslint-disable-next-line max-len
+    if (objectIsEmpty(album)) throw new NotFoundError('fail', `${id} not found`);
+
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+
+        client.query(query.deleteAlbum, [id],
+            (err, result) => {
+              done();
+
+              if (err) throw reject(new InvariantError('fail', err.message));
+              return resolve(result.rows[0].id);
+            });
       });
     });
   }
