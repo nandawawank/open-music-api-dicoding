@@ -57,6 +57,21 @@ class SongsService {
       });
     });
   }
+
+  async getAllSongs() {
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+
+        client.query(query.getSongs, (err, result) => {
+          done();
+
+          if (err) return reject(new InvariantError('fail', err.message));
+          return resolve(result.rows);
+        });
+      });
+    });
+  }
 }
 
 module.exports = SongsService;

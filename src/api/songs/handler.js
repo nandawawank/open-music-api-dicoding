@@ -1,6 +1,7 @@
 const ClientError = require('../../exception/ClientError');
 const InvariantError = require('../../exception/InvariantError');
 
+const GetResponse = require('../../response/GetResponse');
 const PostResponse = require('../../response/PostResponse');
 
 class SongsHandler {
@@ -9,6 +10,26 @@ class SongsHandler {
     this._validator = validator;
 
     this.postSongHandler = this.postSongHandler.bind(this);
+    this.getAllSongsHandler = this.getAllSongsHandler.bind(this);
+  }
+
+  async getAllSongsHandler(request, h) {
+    try {
+      const songs = await this._service.getAllSongs();
+      // eslint-disable-next-line max-len
+      return h.response(new GetResponse('success', 200, {songs: songs})).code(200);
+    } catch (err) {
+      if (err instanceof ClientError) {
+        return h.response({
+          status: err.status,
+          message: err.message,
+          code: err.code,
+        }).code(err.code);
+      }
+
+      // SERVER ERROR
+      return reject(new InvariantError('fail', err));
+    }
   }
 
   async postSongHandler(request, h) {
