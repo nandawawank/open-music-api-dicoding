@@ -52,6 +52,14 @@ exports.up = (pgm) => {
       type: 'VARCHAR(50)',
       notNull: true,
     },
+    create_at: {
+      type: 'TIMESTAMP',
+      notNull: true,
+    },
+    update_at: {
+      type: 'TIMESTAMP',
+      notNull: true,
+    },
   });
 };
 
