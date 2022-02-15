@@ -5,6 +5,24 @@ const objectIsEmpty = (object) => {
   return false;
 };
 
+const mapObjectToSongModel = ({
+  id,
+  title,
+  year,
+  performer,
+  genre,
+  duration = null,
+  album_id = null,
+}) => ({
+  id,
+  title,
+  year,
+  performer,
+  genre,
+  duration: duration,
+  albumId: album_id,
+});
+
 module.exports = {
-  objectIsEmpty,
+  objectIsEmpty, mapObjectToSongModel,
 };

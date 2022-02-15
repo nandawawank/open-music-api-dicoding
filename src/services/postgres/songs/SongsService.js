@@ -3,9 +3,10 @@ const uuid = require('uuid');
 
 const query = require('./query');
 const AlbumsService = require('../albums/AlbumsService');
-const {objectIsEmpty} = require('../../../utils');
+const {objectIsEmpty, mapObjectToSongModel} = require('../../../utils');
 
 const InvariantError = require('../../../exception/InvariantError');
+const NotFoundError = require('../../../exception/NotFoundError');
 
 class SongsService {
   constructor() {
@@ -68,6 +69,24 @@ class SongsService {
 
           if (err) return reject(new InvariantError('fail', err.message));
           return resolve(result.rows);
+        });
+      });
+    });
+  }
+
+  async getSongById(id) {
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+
+        client.query(query.getSongById, [id], (err, result) => {
+          done();
+
+          if (err) return reject(new InvariantError('fail', err.message));
+          // eslint-disable-next-line max-len
+          if (result.rowCount === 0) return reject(new NotFoundError('fail', `${id} not found`));
+
+          return resolve(result.rows.map(mapObjectToSongModel));
         });
       });
     });

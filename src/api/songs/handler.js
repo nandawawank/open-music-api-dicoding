@@ -11,6 +11,7 @@ class SongsHandler {
 
     this.postSongHandler = this.postSongHandler.bind(this);
     this.getAllSongsHandler = this.getAllSongsHandler.bind(this);
+    this.getSongByIdHandler = this.getSongByIdHandler.bind(this);
   }
 
   async getAllSongsHandler(request, h) {
@@ -29,6 +30,30 @@ class SongsHandler {
 
       // SERVER ERROR
       return reject(new InvariantError('fail', err));
+    }
+  }
+
+  async getSongByIdHandler(request, h) {
+    try {
+      const {id} = request.params;
+      if (!id) {
+        return h.response(
+            new InvariantError('fail', 'id is required').code(400));
+      }
+
+      const song = await this._service.getSongById(id);
+      return h.response(new GetResponse('success', 200, {song: song[0]}));
+    } catch (err) {
+      if (err instanceof ClientError) {
+        return h.response({
+          status: err.status,
+          message: err.message,
+          code: err.code,
+        }).code(err.code);
+      }
+
+      // SERVER ERROR
+      return h.response(new InvariantError('fail', err));
     }
   }
 

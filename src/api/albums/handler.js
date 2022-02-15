@@ -42,8 +42,6 @@ class AlbumsHandler {
   async getAlbumByIdHandler(request, h) {
     try {
       const {id} = request.params;
-
-      // eslint-disable-next-line max-len
       if (!id) {
         return h.response(
             new InvariantError('fail', 'id is required').code(400));

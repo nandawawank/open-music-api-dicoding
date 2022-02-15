@@ -14,12 +14,12 @@ class AlbumsService {
   async getAlbumById(id) {
     return new Promise((resolve, reject) => {
       this._pool.connect((err, client, done) => {
-        if (err) throw reject(new InvariantError('fail', err.message));
+        if (err) return reject(new InvariantError('fail', err.message));
         client.query(query.getAlbum, [id],
             (err, result) => {
               done();
 
-              if (err) throw reject(new InvariantError('fail', err.message));
+              if (err) return reject(new InvariantError('fail', err.message));
               // eslint-disable-next-line max-len
               if (result.rowCount === 0) return reject(new NotFoundError('fail', `albums with ${id} not found`));
               return resolve(result.rows[0]);
@@ -36,13 +36,13 @@ class AlbumsService {
 
     return new Promise((resolve, reject) => {
       this._pool.connect((err, client, done) => {
-        if (err) throw reject(new InvariantError('fail', err.message));
+        if (err) return reject(new InvariantError('fail', err.message));
         client.query(query.addAlbum, [id, name, year, createAt, updateAt],
             (err, result) => {
               done();
 
               // eslint-disable-next-line max-len
-              if (err) throw reject(new InvariantError('fail', err.message));
+              if (err) return reject(new InvariantError('fail', err.message));
               return resolve(result.rows[0].id);
             },
         );
@@ -56,13 +56,13 @@ class AlbumsService {
 
     return new Promise((resolve, reject) => {
       this._pool.connect((err, client, done) => {
-        if (err) throw reject(new InvariantError('fail', err.message));
+        if (err) return reject(new InvariantError('fail', err.message));
 
         client.query(query.editAlbum, [name, year, updateAt, id],
             (err, result) => {
               done();
 
-              if (err) throw reject(new InvariantError('fail', err.message));
+              if (err) return reject(new InvariantError('fail', err.message));
               // eslint-disable-next-line max-len
               if (result.rowCount === 0) return reject(new NotFoundError('fail', `${id} not found`));
               return resolve(result.rows[0].id);
@@ -74,7 +74,7 @@ class AlbumsService {
   async deleteAlbumById(id) {
     const album = await this.getAlbumById(id);
     // eslint-disable-next-line max-len
-    if (objectIsEmpty(album)) throw new NotFoundError('fail', `${id} not found`);
+    if (objectIsEmpty(album)) return new NotFoundError('fail', `${id} not found`);
 
     return new Promise((resolve, reject) => {
       this._pool.connect((err, client, done) => {
@@ -84,7 +84,7 @@ class AlbumsService {
             (err, result) => {
               done();
 
-              if (err) throw reject(new InvariantError('fail', err.message));
+              if (err) return reject(new InvariantError('fail', err.message));
               return resolve(result.rows[0].id);
             });
       });
