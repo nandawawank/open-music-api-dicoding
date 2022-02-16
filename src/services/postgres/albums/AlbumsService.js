@@ -2,28 +2,35 @@
 const pg = require('pg');
 const uuid = require('uuid');
 
-const query = require('./query');
 const InvariantError = require('../../../exception/InvariantError');
 const NotFoundError = require('../../../exception/NotFoundError');
 
+const query = require('./query');
+const SongsService = require('../../../services/postgres/songs/SongsService');
+
 const {objectIsEmpty} = require('../../../utils');
 class AlbumsService {
-  constructor() {
+  constructor(songsService) {
     this._pool = new pg.Pool();
+    this._songsService = new SongsService();
   }
 
   async getAlbumById(id) {
+    const song = await this._songsService.getSongByAlbumId(id);
+
     return new Promise((resolve, reject) => {
       this._pool.connect((err, client, done) => {
         if (err) return reject(new InvariantError('fail', err.message));
+
         client.query(query.getAlbum, [id],
             (err, result) => {
               done();
 
               if (err) return reject(new InvariantError('fail', err.message));
-
               if (result.rowCount === 0) return reject(new NotFoundError('fail', `albums with ${id} not found`));
-              return resolve(result.rows[0]);
+
+              const allResult = {...result.rows[0], song};
+              return resolve(allResult);
             });
       });
     });

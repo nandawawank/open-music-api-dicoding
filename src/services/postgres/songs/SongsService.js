@@ -3,16 +3,15 @@ const {Pool} = require('pg');
 const uuid = require('uuid');
 
 const query = require('./query');
-const AlbumsService = require('../albums/AlbumsService');
 const {objectIsEmpty, mapObjectToSongModel} = require('../../../utils');
 
+const ClientError = require('../../../exception/ClientError');
 const InvariantError = require('../../../exception/InvariantError');
 const NotFoundError = require('../../../exception/NotFoundError');
-
 class SongsService {
-  constructor() {
+  constructor(albumsService) {
     this._pool = new Pool();
-    this._albumService = new AlbumsService();
+    this._albumsService = albumsService;
   }
 
   async addSong(payload) {
@@ -31,14 +30,12 @@ class SongsService {
 
     return new Promise(async (resolve, reject) => {
       if (albumId !== null) {
-        const album = await this._albumService.getAlbumById(albumId);
-
-        if (objectIsEmpty(album)) return new InvariantError('fail', `album with ${albumId} not found`);
+        const album = await this._albumsService.getAlbumById(albumId);
+        if (album instanceof ClientError) return reject(new InvariantError('fail', `album with ${albumId} not found`));
       }
 
       this._pool.connect((err, client, done) => {
-        if (err) throw reject(new InvariantError('fail', err.message));
-
+        if (err) return reject(new InvariantError('fail', err.message));
         client.query(query.addSong, [
           id,
           title,
@@ -59,12 +56,18 @@ class SongsService {
     });
   }
 
-  async getAllSongs() {
+  async getAllSongs(title, performer) {
+    const conditionSql = '';
+
+    title != undefined ? conditionSql = `where title = ${title}`: '';
+    performer != undefined ? conditionSql = `where performer = ${performer}`: '';
+    title != undefined && performer != undefined ? conditionSql = `where title = ${title} and performer = ${performer}`: '';
+
     return new Promise((resolve, reject) => {
       this._pool.connect((err, client, done) => {
         if (err) return reject(new InvariantError('fail', err.message));
 
-        client.query(query.getSongs, (err, result) => {
+        client.query(query.getSongs + conditionSql, (err, result) => {
           done();
 
           if (err) return reject(new InvariantError('fail', err.message));
@@ -91,6 +94,21 @@ class SongsService {
     });
   }
 
+  async getSongByAlbumId(id) {
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+
+        client.query(query.getSongByAlbumId, [id], (err, result) => {
+          done();
+
+          if (err) return reject(new InvariantError('fail', err.message));
+          return resolve(result.rows.map(mapObjectToSongModel));
+        });
+      });
+    });
+  }
+
   async editSongById(id, payload) {
     const {
       title,
@@ -104,7 +122,7 @@ class SongsService {
 
     return new Promise(async (resolve, reject) => {
       if (albumId !== null) {
-        const albumId = await this._albumService.getAlbumById(albumId);
+        const albumId = await this._albumsService.getAlbumById(albumId);
         if (objectIsEmpty(albumId)) return reject(new NotFoundError('fail', `${albumId} not found`));
       }
 

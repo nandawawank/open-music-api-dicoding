@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 
 const ClientError = require('../../exception/ClientError');
 const InvariantError = require('../../exception/InvariantError');
@@ -41,13 +42,13 @@ class AlbumsHandler {
 
   async getAlbumByIdHandler(request, h) {
     try {
-      const {id} = request.params;
-      if (!id) {
+      const {albumId} = request.params;
+      if (!albumId) {
         return h.response(
             new InvariantError('fail', 'id is required').code(400));
       }
 
-      const album = await this._service.getAlbumById(id);
+      const album = await this._service.getAlbumById(albumId);
 
       return h.response(
           new GetResponse('success', 200, {album: album})).code(200);
@@ -69,15 +70,15 @@ class AlbumsHandler {
     try {
       this._validator.validatorAlbumPayload(request.payload);
 
-      const id = request.params.id;
-      if (!id) return h.response(new InvariantError('fail', 'id is required'));
+      const {albumId} = request.params;
+      if (!albumId) return h.response(new InvariantError('fail', 'id is required'));
 
-      const albumId = await this._service.editAlbumById(id, request.payload);
+      const id = await this._service.editAlbumById(albumId, request.payload);
 
       return h.response(
           new PutResponse(
               'success', 200,
-              `Albums with ${albumId} has been updated`))
+              `Albums with ${id} has been updated`))
           .code(200);
     } catch (err) {
       if (err instanceof ClientError) {
@@ -95,14 +96,14 @@ class AlbumsHandler {
 
   async deleteAlbumByIdHandler(request, h) {
     try {
-      const id = request.params.id;
-      if (!id) return h.response(new InvariantError('fail', 'id is required'));
+      const {albumId} = request.params;
+      if (!albumId) return h.response(new InvariantError('fail', 'id is required'));
 
-      const albumId = await this._service.deleteAlbumById(id);
+      const id = await this._service.deleteAlbumById(albumId);
 
       return h.response({
         status: 'success',
-        message: `${albumId} has been deleted`,
+        message: `${id} has been deleted`,
         code: 200,
       }).code(200);
     } catch (err) {

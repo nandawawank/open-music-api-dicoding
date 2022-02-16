@@ -22,7 +22,12 @@ class SongsHandler {
 
   async getAllSongsHandler(request, h) {
     try {
-      const songs = await this._service.getAllSongs();
+      const {
+        title = null,
+        performer = null,
+      } = request.query;
+
+      const songs = await this._service.getAllSongs(title, performer);
       return h.response(new GetResponse('success', 200, {songs: songs})).code(200);
     } catch (err) {
       if (err instanceof ClientError) {
@@ -40,13 +45,13 @@ class SongsHandler {
 
   async getSongByIdHandler(request, h) {
     try {
-      const {id} = request.params;
-      if (!id) {
+      const {songId} = request.params;
+      if (!songId) {
         return h.response(
             new InvariantError('fail', 'id is required').code(400));
       }
 
-      const song = await this._service.getSongById(id);
+      const song = await this._service.getSongById(songId);
       return h.response(new GetResponse('success', 200, {song: song[0]}));
     } catch (err) {
       if (err instanceof ClientError) {
@@ -87,10 +92,10 @@ class SongsHandler {
     try {
       this._validator.validatorSongPayload(request.payload);
 
-      const id = request.params.id;
-      if (!id) return h.response(new InvariantError('fail', 'id is required')).code(400);
+      const {songId} = request.params;
+      if (!songId) return h.response(new InvariantError('fail', 'id is required')).code(400);
 
-      const song = await this._service.getSongById(id);
+      const song = await this._service.getSongById(songId);
       if (song instanceof ClientError) {
         return h.response({
           status: song.status,
@@ -99,8 +104,8 @@ class SongsHandler {
         }).code(song.code);
       }
 
-      const songId = await this._service.editSongById(id, request.payload);
-      return h.response(new PutResponse('success', 200, `song with ${songId} has been added`)).code(200);
+      const id = await this._service.editSongById(songId, request.payload);
+      return h.response(new PutResponse('success', 200, `song with ${id} has been added`)).code(200);
     } catch (err) {
       if (err instanceof ClientError) {
         return h.response({
@@ -117,10 +122,10 @@ class SongsHandler {
 
   async deleteSongByIdHandler(request, h) {
     try {
-      const id = request.params.id;
-      if (!id) return h.response(new InvariantError('fail', 'id is required')).code(400);
+      const {songId} = request.params;
+      if (!songId) return h.response(new InvariantError('fail', 'id is required')).code(400);
 
-      const song = await this._service.getSongById(id);
+      const song = await this._service.getSongById(songId);
       if (song instanceof ClientError) {
         return h.response({
           status: song.status,
@@ -129,8 +134,8 @@ class SongsHandler {
         }).code(song.code);
       }
 
-      const songId = await this._service.deleteSongById(id);
-      return h.response(new DeleteResponse('success', `song with ${songId} has been deleted`)).code(200);
+      const id = await this._service.deleteSongById(songId);
+      return h.response(new DeleteResponse('success', `song with ${id} has been deleted`)).code(200);
     } catch (err) {
       if (err instanceof ClientError) {
         return h.response({
