@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 const pg = require('pg');
 const uuid = require('uuid');
 
@@ -20,7 +21,7 @@ class AlbumsService {
               done();
 
               if (err) return reject(new InvariantError('fail', err.message));
-              // eslint-disable-next-line max-len
+
               if (result.rowCount === 0) return reject(new NotFoundError('fail', `albums with ${id} not found`));
               return resolve(result.rows[0]);
             });
@@ -41,7 +42,7 @@ class AlbumsService {
             (err, result) => {
               done();
 
-              // eslint-disable-next-line max-len
+
               if (err) return reject(new InvariantError('fail', err.message));
               return resolve(result.rows[0].id);
             },
@@ -54,6 +55,9 @@ class AlbumsService {
     const {name, year} = payload;
     const updateAt = new Date().toISOString();
 
+    const album = await this.getAlbumById(id);
+    if (objectIsEmpty(album)) return new NotFoundError('fail', `${id} not found`);
+
     return new Promise((resolve, reject) => {
       this._pool.connect((err, client, done) => {
         if (err) return reject(new InvariantError('fail', err.message));
@@ -63,7 +67,7 @@ class AlbumsService {
               done();
 
               if (err) return reject(new InvariantError('fail', err.message));
-              // eslint-disable-next-line max-len
+
               if (result.rowCount === 0) return reject(new NotFoundError('fail', `${id} not found`));
               return resolve(result.rows[0].id);
             });
@@ -73,7 +77,6 @@ class AlbumsService {
 
   async deleteAlbumById(id) {
     const album = await this.getAlbumById(id);
-    // eslint-disable-next-line max-len
     if (objectIsEmpty(album)) return new NotFoundError('fail', `${id} not found`);
 
     return new Promise((resolve, reject) => {

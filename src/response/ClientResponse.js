@@ -1,5 +1,5 @@
 class ClientResponse {
-  constructor(status, code) {
+  constructor(status, code = 200) {
     this.name = 'ClientResponse';
     this.status = status;
     this.code = code;
