@@ -57,17 +57,19 @@ class SongsService {
   }
 
   async getAllSongs(title, performer) {
-    const conditionSql = '';
-
-    title != undefined ? conditionSql = `where title = ${title}`: '';
-    performer != undefined ? conditionSql = `where performer = ${performer}`: '';
-    title != undefined && performer != undefined ? conditionSql = `where title = ${title} and performer = ${performer}`: '';
+    let condition = '';
+    if (title != null && performer != null) {
+      condition = ` WHERE lower(title) like '%${title}%' and lower(performer) like '%${performer}%'`;
+    } else {
+      if (title != null && performer == null) condition = ` WHERE lower(title) like '%${title}%'`;
+      if (title == null && performer != null) condition = ` WHERE lower(performer) like '%${performer}%'`;
+    }
 
     return new Promise((resolve, reject) => {
       this._pool.connect((err, client, done) => {
         if (err) return reject(new InvariantError('fail', err.message));
 
-        client.query(query.getSongs + conditionSql, (err, result) => {
+        client.query(query.getSongs + condition, (err, result) => {
           done();
 
           if (err) return reject(new InvariantError('fail', err.message));

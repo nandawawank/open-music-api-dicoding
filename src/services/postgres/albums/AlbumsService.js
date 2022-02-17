@@ -16,7 +16,7 @@ class AlbumsService {
   }
 
   async getAlbumById(id) {
-    const song = await this._songsService.getSongByAlbumId(id);
+    const songs = await this._songsService.getSongByAlbumId(id);
 
     return new Promise((resolve, reject) => {
       this._pool.connect((err, client, done) => {
@@ -29,7 +29,7 @@ class AlbumsService {
               if (err) return reject(new InvariantError('fail', err.message));
               if (result.rowCount === 0) return reject(new NotFoundError('fail', `albums with ${id} not found`));
 
-              const allResult = {...result.rows[0], song};
+              const allResult = {...result.rows[0], songs};
               return resolve(allResult);
             });
       });

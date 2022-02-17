@@ -39,7 +39,7 @@ class SongsHandler {
       }
 
       // SERVER ERROR
-      return reject(new InvariantError('fail', err));
+      return h.response(new InvariantError('fail', err));
     }
   }
 
