@@ -7,7 +7,7 @@ const SongValidator = {
     const validationResult = SongPayloadSchema.validate(payload);
 
     if (validationResult.error) {
-      return new InvariantError('fail', validationResult.error.message);
+      throw new InvariantError('fail', validationResult.error.message);
     }
   },
 };
