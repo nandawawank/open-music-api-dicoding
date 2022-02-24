@@ -1,10 +1,10 @@
 const ClientResponse = require('./ClientResponse');
 
 class PutRequest extends ClientResponse {
-  constructor(status, code, message) {
-    super(status, code, message);
+  constructor(status, statusCode, message) {
+    super(status, statusCode, message);
     this.status = status;
-    this.code = code;
+    this.statusCode = statusCode;
     this.message = message;
   }
 }

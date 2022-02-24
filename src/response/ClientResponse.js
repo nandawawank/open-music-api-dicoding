@@ -1,8 +1,8 @@
 class ClientResponse {
-  constructor(status, code = 200) {
+  constructor(status, statusCode = 200) {
     this.name = 'ClientResponse';
     this.status = status;
-    this.code = code;
+    this.statusCode = statusCode;
   }
 }
 

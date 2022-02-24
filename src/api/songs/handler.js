@@ -34,8 +34,8 @@ class SongsHandler {
         return h.response({
           status: err.status,
           message: err.message,
-          code: err.code,
-        }).code(err.code);
+          statusCode: err.statusCode,
+        }).code(err.statusCode);
       }
 
       // SERVER ERROR
@@ -58,8 +58,8 @@ class SongsHandler {
         return h.response({
           status: err.status,
           message: err.message,
-          code: err.code,
-        }).code(err.code);
+          statusCode: err.statusCode,
+        }).code(err.statusCode);
       }
 
       // SERVER ERROR
@@ -79,8 +79,8 @@ class SongsHandler {
         return h.response({
           status: err.status,
           message: err.message,
-          code: err.code,
-        }).code(err.code);
+          statusCode: err.statusCode,
+        }).code(err.statusCode);
       }
 
       // SERVER ERROR
@@ -100,8 +100,8 @@ class SongsHandler {
         return h.response({
           status: song.status,
           message: song.message,
-          code: song.code,
-        }).code(song.code);
+          statusCode: song.statusCode,
+        }).code(song.statusCode);
       }
 
       const id = await this._service.editSongById(songId, request.payload);
@@ -111,8 +111,8 @@ class SongsHandler {
         return h.response({
           status: err.status,
           message: err.message,
-          code: err.code,
-        }).code(err.code);
+          statusCode: err.statusCode,
+        }).code(err.statusCode);
       }
 
       // SERVER ERROR
@@ -130,8 +130,8 @@ class SongsHandler {
         return h.response({
           status: song.status,
           message: song.message,
-          code: song.code,
-        }).code(song.code);
+          statusCode: song.statusCode,
+        }).code(song.statusCode);
       }
 
       const id = await this._service.deleteSongById(songId);
@@ -141,8 +141,8 @@ class SongsHandler {
         return h.response({
           status: err.status,
           message: err.message,
-          code: err.code,
-        }).code(err.code);
+          statusCode: err.statusCode,
+        }).code(err.statusCode);
       }
 
       // SERVER ERROR

@@ -1,11 +1,11 @@
 const ClientResponse = require('./ClientResponse');
 
 class GetResponse extends ClientResponse {
-  constructor(status, code, data) {
-    super(status, code);
+  constructor(status, statusCode, data) {
+    super(status, statusCode);
     this.name = 'GetResponse';
     this.status = status;
-    this.code = code;
+    this.statusCode = statusCode;
     this.data = data;
   }
 }

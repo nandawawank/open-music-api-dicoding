@@ -31,8 +31,8 @@ class AlbumsHandler {
         return h.response({
           status: err.status,
           message: err.message,
-          code: err.code,
-        }).code(err.code);
+          statusCode: err.statusCode,
+        }).code(err.statusCode);
       }
 
       // SERVER ERROR
@@ -57,8 +57,8 @@ class AlbumsHandler {
         return h.response({
           status: err.status,
           message: err.message,
-          code: err.code,
-        }).code(err.code);
+          statusCode: err.statusCode,
+        }).code(err.statusCode);
       }
 
       // SERVER ERROR
@@ -85,8 +85,8 @@ class AlbumsHandler {
         return h.response({
           status: err.status,
           message: err.message,
-          code: err.code,
-        }).code(err.code);
+          statusCode: err.statusCode,
+        }).code(err.statusCode);
       }
 
       // SERVER ERROR
@@ -111,8 +111,8 @@ class AlbumsHandler {
         return h.response({
           status: err.status,
           message: err.message,
-          code: err.code,
-        }).code(err.code);
+          statusCode: err.statusCode,
+        }).code(err.statusCode);
       }
 
       // SERVER ERROR
