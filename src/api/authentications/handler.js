@@ -1,3 +1,4 @@
+/* eslint-disable new-cap */
 /* eslint-disable max-len */
 const PostResponse = require('../../response/PostResponse');
 
@@ -9,6 +10,7 @@ class AuthenticationHandler {
     this._validator = validator;
 
     this.postAuthenticationHandler = this.postAuthenticationHandler.bind(this);
+    this.putAuthenticationHandler = this.putAuthenticationHandler.bind(this);
   }
 
   async postAuthenticationHandler(request, h) {
@@ -24,7 +26,31 @@ class AuthenticationHandler {
       await this._authenticationService.addToken({userId, token});
       await this._authenticationService.addRefreshToken({userId, refreshToken});
 
-      return h.response(new PostResponse('success', 200, `Authentication has been Successfully`)).code(200);
+      return h.response(new PostResponse('success', 201, {
+        accessToken: token,
+        refreshToken: refreshToken,
+      })).code(201);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async putAuthenticationHandler(request, h) {
+    try {
+      this._validator.validatorRefreshTokenPayload(request.payload);
+
+      const {refreshToken} = request.payload;
+
+      await this._authenticationService.verifyRefreshToken({refreshToken});
+      const {userId} = this._tokenManager.verifyRefreshToken(refreshToken);
+
+      const newToken = this._tokenManager.generateToken({userId});
+      const newRefreshToken = this._tokenManager.generateRefreshToken({userId});
+
+      await this._authenticationService.addToken({userId, token: newToken});
+      await this._authenticationService.addRefreshToken({userId, refreshToken: newRefreshToken});
+
+      return h.response(new PostResponse('success', 200, {accessToken: newToken})).code(200);
     } catch (err) {
       throw err;
     }

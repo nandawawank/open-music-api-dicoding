@@ -19,7 +19,7 @@ class UsersService {
     const salt = bcrypt.genSaltSync(parseInt(process.env.SALTLONG));
     const hashPassword = bcrypt.hashSync(password, salt);
 
-    await this.verifyNewUsername({username});
+    await this.verifyNewUsername(username);
     return new Promise((resolve, reject) => {
       this._pool.connect((err, client, done) => {
         if (err) return reject(new InvariantError('fail', err.message));
@@ -41,8 +41,8 @@ class UsersService {
     });
   }
 
-  async verifyNewUsername({username}) {
-    return new Promise((_, reject) => {
+  async verifyNewUsername(username) {
+    return new Promise((resolve, reject) => {
       this._pool.connect((err, client, done) => {
         if (err) return reject(new InvariantError('fail', err.message));
 
@@ -50,15 +50,13 @@ class UsersService {
           done();
           if (err) return reject(new InvariantError('fail', err.message));
           if (result.rowCount !== 0) return reject(new InvariantError('fail', `${username} already exists`));
+          return resolve([]);
         });
       });
     });
   }
 
   async verifyUserCredential({username, password}) {
-    const salt = bcrypt.genSaltSync(parseInt(process.env.SALTLONG));
-    const hashPassword = bcrypt.hashSync(password, salt);
-
     return new Promise((resolve, reject) => {
       this._pool.connect((err, client, done) => {
         if (err) return reject(new InvariantError('fail', err.message));
@@ -68,7 +66,7 @@ class UsersService {
           if (err) return reject(new InvariantError('fail', err.message));
           if (result.rowCount === 0) return reject(new AuthenticationError('fail', 'username not exist'));
 
-          const isMatch = bcrypt.compareSync(hashPassword, result.rows[0].password);
+          const isMatch = bcrypt.compareSync(password, result.rows[0].password);
           if (!isMatch) return reject(new AuthenticationError('fail', 'Credential Not Valid'));
 
           return resolve(result.rows[0].id);
