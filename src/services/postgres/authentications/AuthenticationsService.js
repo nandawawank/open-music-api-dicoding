@@ -60,6 +60,38 @@ class AuthenticationsService {
       });
     });
   }
+
+  async deleteToken({userId}) {
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+
+        client.query(query.deleteToken, [userId], (err, result) => {
+          done();
+
+          if (err) return reject(new InvariantError('fail', err.message));
+          if (result.rowCount === 0) return reject(new InvariantError('fail', `${userId} is not found`));
+          return resolve([]);
+        });
+      });
+    });
+  }
+
+  async deleteRefreshToken({userId}) {
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+
+        client.query(query.deleteRefreshToken, [userId], (err, result) => {
+          done();
+
+          if (err) return reject(new InvariantError('fail', err.message));
+          if (result.rowCount === 0) return reject(new InvariantError('fail', `${userId} is not found`));
+          return resolve([]);
+        });
+      });
+    });
+  }
 }
 
 module.exports = AuthenticationsService;

@@ -1,6 +1,7 @@
 /* eslint-disable new-cap */
 /* eslint-disable max-len */
 const PostResponse = require('../../response/PostResponse');
+const DeleteResponse = require('../../response/DeleteResponse');
 
 class AuthenticationHandler {
   constructor(userService, authenticationService, tokenManager, validator) {
@@ -11,6 +12,7 @@ class AuthenticationHandler {
 
     this.postAuthenticationHandler = this.postAuthenticationHandler.bind(this);
     this.putAuthenticationHandler = this.putAuthenticationHandler.bind(this);
+    this.deleteAuthenticationHandler = this.deleteAuthenticationHandler.bind(this);
   }
 
   async postAuthenticationHandler(request, h) {
@@ -51,6 +53,24 @@ class AuthenticationHandler {
       await this._authenticationService.addRefreshToken({userId, refreshToken: newRefreshToken});
 
       return h.response(new PostResponse('success', 200, {accessToken: newToken})).code(200);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async deleteAuthenticationHandler(request, h) {
+    try {
+      this._validator.validatorRefreshTokenPayload(request.payload);
+
+      const {refreshToken} = request.payload;
+
+      await this._authenticationService.verifyRefreshToken({refreshToken});
+      const {userId} = this._tokenManager.verifyRefreshToken(refreshToken);
+
+      await this._authenticationService.deleteToken({userId});
+      await this._authenticationService.deleteRefreshToken({userId});
+
+      return h.response(new DeleteResponse('success', `Token ${userId} has been deleted`));
     } catch (err) {
       throw err;
     }
