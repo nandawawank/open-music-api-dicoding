@@ -55,7 +55,7 @@ const init = async () => {
   ]);
 
   // mendefinisikan strategy autentikasi jwt
-  server.auth.strategy('music_app_jwt', 'jwt', {
+  server.auth.strategy('musicapp_jwt', 'jwt', {
     keys: process.env.TOKEN,
     verify: {
       aud: false,
@@ -105,10 +105,11 @@ const init = async () => {
     {
       plugin: playlists,
       options: {
-        services: playlistsService,
+        songsService,
+        playlistsService,
         validator: PlaylistsValidator,
-      }
-    }
+      },
+    },
   ]);
 
   await server.ext('onPreResponse', (request, h) => {

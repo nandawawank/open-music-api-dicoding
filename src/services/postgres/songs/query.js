@@ -10,4 +10,5 @@ module.exports = {
   genre = $4, duration = $5, album_id = $6, update_at = $7 where id = $8 
   RETURNING id`,
   deleteSongById: `DELETE FROM songs WHERE id = $1 RETURNING id`,
+  verifySongId: `SELECT id FROM songs WHERE id = $1`,
 };

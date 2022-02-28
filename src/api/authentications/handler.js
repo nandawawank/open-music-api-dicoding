@@ -22,8 +22,8 @@ class AuthenticationHandler {
       const {username, password} = request.payload;
       const userId = await this._userService.verifyUserCredential({username, password});
 
-      const token = this._tokenManager.generateToken({userId});
-      const refreshToken = this._tokenManager.generateRefreshToken({userId});
+      const token = this._tokenManager.generateToken({id: userId});
+      const refreshToken = this._tokenManager.generateRefreshToken({id: userId});
 
       await this._authenticationService.addToken({userId, token});
       await this._authenticationService.addRefreshToken({userId, refreshToken});

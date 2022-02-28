@@ -164,6 +164,23 @@ class SongsService {
       });
     });
   }
+
+  async verifySongId({songId}) {
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+
+        client.query(query.verifySongId, [songId], (err, result) => {
+          done();
+
+          if (err) return reject(new InvariantError('fail', err.message));
+          if (result.rowCount === 0) return reject(new NotFoundError('fail', `Song ${songId} not found`));
+
+          return resolve([]);
+        });
+      });
+    });
+  }
 }
 
 module.exports = SongsService;

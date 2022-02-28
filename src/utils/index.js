@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 const objectIsEmpty = (object) => {
   const length = Object.keys(object).length;
 
@@ -22,6 +23,7 @@ const mapObjectToSongModel = ({
   duration: duration,
   albumId: album_id,
 });
+
 
 module.exports = {
   objectIsEmpty, mapObjectToSongModel,
