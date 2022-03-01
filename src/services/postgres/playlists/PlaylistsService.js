@@ -5,6 +5,7 @@ const query = require('./query');
 
 const InvariantError = require('../../../exception/InvariantError');
 const NotFoundError = require('../../../exception/NotFoundError');
+const PermissionError = require('../../../exception/PermissionError');
 
 class PlaylistsService {
   constructor() {
@@ -47,7 +48,23 @@ class PlaylistsService {
           if (err) return reject(new InvariantError('fail', err.message));
           if (result.rowCount === 0) return reject(new NotFoundError('fail', `Playlist for ${owner} not found`));
 
-          // const newResponse = result.rows.map(mapObjectToPlaylistModel);
+          return resolve(result.rows);
+        });
+      });
+    });
+  }
+
+  async getPlaylistById({playlistId}) {
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+
+        client.query(query.getPlaylistById, [playlistId], (err, result) => {
+          done();
+
+          if (err) return reject(new InvariantError('fail', err.message));
+          if (result.rowCount === 0) return reject(new NotFoundError('fail', `Playlist ${playlistId} not found`));
+
           return resolve(result.rows);
         });
       });
@@ -89,6 +106,39 @@ class PlaylistsService {
 
           if (err) return reject(new InvariantError('fail', err.message));
           return resolve(result.rows[0].id);
+        });
+      });
+    });
+  }
+
+  async verifyPlaylistOwner({owner, playlistId}) {
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+
+        client.query(query.verifyPlaylistOwner, [playlistId, owner], (err, result) => {
+          done();
+
+          if (err) return reject(new InvariantError('fail', err.message));
+          if (result.rowCount === 0) return reject(new PermissionError('fail', `Permission denied`));
+          return resolve([]);
+        });
+      });
+    });
+  }
+
+  async getPlaylistSongs({playlistId}) {
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+
+        client.query(query.getPlaylistSongs, [playlistId], (err, result) => {
+          done();
+
+          if (err) return reject(new InvariantError('fail', err.message));
+          if (result.rowCount === 0) return reject(new NotFoundError('fail', `Playlist not found`));
+
+          return resolve(result.rows);
         });
       });
     });

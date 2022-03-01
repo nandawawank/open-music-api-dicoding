@@ -181,6 +181,23 @@ class SongsService {
       });
     });
   }
+
+  async getSongByPlaylistId({playlistId}) {
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+
+        client.query(query.getSongsByPlaylistId, [playlistId], (err, result) => {
+          done();
+
+          if (err) return reject(new InvariantError('fail', err.message));
+          if (result.rowCount === 0) return reject(new NotFoundError('fail', `song with not found`));
+
+          return resolve(result.rows);
+        });
+      });
+    });
+  }
 }
 
 module.exports = SongsService;

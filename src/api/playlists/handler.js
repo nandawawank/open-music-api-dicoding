@@ -13,6 +13,7 @@ class PlaylistsHandler {
     this.getPlaylistHandler = this.getPlaylistHandler.bind(this);
     this.deletePlaylistHandler = this.deletePlaylistHandler.bind(this);
     this.postPlaylistSongHandler = this.postPlaylistSongHandler.bind(this);
+    this.getPlaylistSongHandler = this.getPlaylistSongHandler.bind(this);
   }
 
   async postPlaylistHandler(request, h) {
@@ -43,8 +44,9 @@ class PlaylistsHandler {
       const {id: credentialId} = request.auth.credentials;
       const {playlistId} = request.params;
 
+      await this._playlistsService.verifyPlaylistOwner({owner: credentialId, playlistId});
       await this._playlistsService.deletePlaylist({playlistId, owner: credentialId});
-      return h.response(new DeleteResponse('success', `Playlist ${plalistId} has been deleted`)).code(200);
+      return h.response(new DeleteResponse('success', `Playlist ${playlistId} has been deleted`)).code(200);
     } catch (err) {
       throw err;
     }
@@ -54,15 +56,43 @@ class PlaylistsHandler {
     try {
       this._validator.validatorPlaylistSongPayload(request.payload);
 
+      const {id: credentialId} = request.auth.credentials;
       const {playlistId} = request.params;
       const {songId} = request.payload;
 
       await this._songsService.verifySongId({songId});
+      await this._playlistsService.verifyPlaylistOwner({owner: credentialId, playlistId});
       const playlistSongId = await this._playlistsService.addPlaylistSong({playlistId, songId});
       return h.response({
         status: 'success',
         message: `Song ${playlistSongId} has been added to playlist`,
       }).code(201);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async getPlaylistSongHandler(request, h) {
+    try {
+      const {id: credentialId} = request.auth.credentials;
+      const {playlistId} = request.params;
+
+      await this._playlistsService.verifyPlaylistOwner({owner: credentialId, playlistId});
+      // const playlistSongs = await this._playlistsService.getPlaylistSongs({playlistId});
+
+      const playlists = await this._playlistsService.getPlaylistById({playlistId});
+      const songs = await this._songsService.getSongByPlaylistId({playlistId});
+
+      const response = {
+        playlist: {
+          ...playlists[0],
+          songs: [
+            ...songs,
+          ],
+        },
+      };
+
+      return h.response(new GetResponse('success', response));
     } catch (err) {
       throw err;
     }
