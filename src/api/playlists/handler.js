@@ -2,6 +2,7 @@
 const PostResponse = require('../../response/PostResponse');
 const GetResponse = require('../../response/GetResponse');
 const DeleteResponse = require('../../response/DeleteResponse');
+const NotFoundError = require('../../exception/NotFoundError');
 
 class PlaylistsHandler {
   constructor(songsService, playlistsService, validator) {
@@ -14,6 +15,7 @@ class PlaylistsHandler {
     this.deletePlaylistHandler = this.deletePlaylistHandler.bind(this);
     this.postPlaylistSongHandler = this.postPlaylistSongHandler.bind(this);
     this.getPlaylistSongHandler = this.getPlaylistSongHandler.bind(this);
+    this.deletePlaylistSongHandler = this.deletePlaylistSongHandler.bind(this);
   }
 
   async postPlaylistHandler(request, h) {
@@ -77,11 +79,14 @@ class PlaylistsHandler {
       const {id: credentialId} = request.auth.credentials;
       const {playlistId} = request.params;
 
-      await this._playlistsService.verifyPlaylistOwner({owner: credentialId, playlistId});
-      // const playlistSongs = await this._playlistsService.getPlaylistSongs({playlistId});
-
       const playlists = await this._playlistsService.getPlaylistById({playlistId});
       const songs = await this._songsService.getSongByPlaylistId({playlistId});
+
+      if (playlists.length < 0) {
+        return h.response(new NotFoundError('fail', 'Playlist not found'));
+      }
+
+      await this._playlistsService.verifyPlaylistOwner({owner: credentialId, playlistId});
 
       const response = {
         playlist: {
@@ -93,6 +98,22 @@ class PlaylistsHandler {
       };
 
       return h.response(new GetResponse('success', response));
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async deletePlaylistSongHandler(request, h) {
+    try {
+      this._validator.validatorPlaylistSongPayload(request.payload);
+
+      const {id: credentialId} = request.auth.credentials;
+      const {playlistId} = request.params;
+      const {songId} = request.payload;
+
+      await this._playlistsService.verifyPlaylistOwner({owner: credentialId, playlistId});
+      await this._playlistsService.deletePlaylistSongByPlaylistSongId({playlistId, songId});
+      return h.response(new DeleteResponse('success', `Song in playlist ${playlistId} has been deleted`));
     } catch (err) {
       throw err;
     }

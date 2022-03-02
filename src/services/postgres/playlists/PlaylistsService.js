@@ -127,18 +127,16 @@ class PlaylistsService {
     });
   }
 
-  async getPlaylistSongs({playlistId}) {
+  async deletePlaylistSongByPlaylistSongId({playlistId, songId}) {
     return new Promise((resolve, reject) => {
       this._pool.connect((err, client, done) => {
         if (err) return reject(new InvariantError('fail', err.message));
 
-        client.query(query.getPlaylistSongs, [playlistId], (err, result) => {
+        client.query(query.deletePlaylistSong, [playlistId, songId], (err, result) => {
           done();
 
           if (err) return reject(new InvariantError('fail', err.message));
-          if (result.rowCount === 0) return reject(new NotFoundError('fail', `Playlist not found`));
-
-          return resolve(result.rows);
+          return resolve(result.rows[0].id);
         });
       });
     });

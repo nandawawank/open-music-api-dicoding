@@ -56,4 +56,17 @@ module.exports = (handler) => [
       },
     },
   },
+  {
+    method: 'DELETE',
+    path: '/playlists/{playlistId}/songs',
+    handler: handler.deletePlaylistSongHandler,
+    options: {
+      auth: 'musicapp_jwt',
+      validate: {
+        params: Joi.object({
+          playlistId: Joi.string().required(),
+        }),
+      },
+    },
+  },
 ];
