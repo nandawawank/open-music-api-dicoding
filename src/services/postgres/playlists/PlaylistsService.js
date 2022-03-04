@@ -127,6 +127,23 @@ class PlaylistsService {
     });
   }
 
+  async verifyPlaylistById({playlistId}) {
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+
+        client.query(query.verifyPlaylistById, [playlistId], (err, result) => {
+          done();
+
+          if (err) return reject(new InvariantError('fail', err.message));
+          if (result.rowCount === 0) return reject(new NotFoundError('fail', `Playlist ${playlistId} not found`));
+
+          return resolve([]);
+        });
+      });
+    });
+  }
+
   async deletePlaylistSongByPlaylistSongId({playlistId, songId}) {
     return new Promise((resolve, reject) => {
       this._pool.connect((err, client, done) => {

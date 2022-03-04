@@ -7,6 +7,7 @@ const query = require('./query');
 
 const AuthenticationError = require('../../../exception/AuthenticationError');
 const InvariantError = require('../../../exception/InvariantError');
+const NotFoundError = require('../../../exception/NotFoundError');
 class UsersService {
   constructor() {
     this._pool = new Pool();
@@ -70,6 +71,23 @@ class UsersService {
           if (!isMatch) return reject(new AuthenticationError('fail', 'Credential Not Valid'));
 
           return resolve(result.rows[0].id);
+        });
+      });
+    });
+  }
+
+  async verifyUserById({userId}) {
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+
+        client.query(query.verifyUserById, [userId], (err, result) => {
+          done();
+
+          if (err) return reject(new InvariantError('fail', err.message));
+          if (result.rowCount === 0) return reject(new NotFoundError('fail', `User ${userId} does not exist`));
+
+          return resolve([]);
         });
       });
     });

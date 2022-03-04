@@ -12,4 +12,5 @@ module.exports = {
   verifyPlaylistOwner: `SELECT id, owner FROM playlists WHERE id = $1 and owner = $2`,
   getPlaylistSongs: `SELECT playlist_id, song_id FROM playlist_songs WHERE playlist_id = $1`,
   deletePlaylistSong: `DELETE FROM playlist_songs WHERE playlist_id = $1 and song_id = $2 RETURNING playlist_id`,
+  verifyPlaylistById: `SELECT id, name, owner FROM playlists WHERE id = $1`,
 };

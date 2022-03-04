@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 const {Pool} = require('pg');
+const uuid = require('uuid');
 const query = require('./query');
 
 const InvariantError = require('../../../exception/InvariantError');
@@ -9,12 +10,22 @@ class CollaborationsService {
     this._pool = new Pool();
   }
 
-  async addCollaborations({playlistId, songId}) {
+  async addCollaboration({playlistId, userId}) {
+    const id = `collaboration-${uuid.v4()}`;
+    const createAt = new Date().toISOString();
+    const updateAt = createAt;
+
     return new Promise((resolve, reject) => {
       this._pool.connect((err, client, done) => {
-        if (err.message) return reject(new InvariantError('fail', err.message));
+        if (err) return reject(new InvariantError('fail', err.message));
 
-        client.query(query.addCollaborations, [playlistId, songId], (err, result) => {
+        client.query(query.addCollaborations, [
+          id,
+          playlistId,
+          userId,
+          createAt,
+          updateAt,
+        ], (err, result) => {
           done();
 
           if (err) return reject(new InvariantError('fail', err.message));

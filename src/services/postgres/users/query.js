@@ -5,4 +5,5 @@ module.exports = {
   verifyUserCredential: `SELECT id, password 
     FROM users WHERE username = $1`,
   verifyNewUsername: `SELECT * FROM users WHERE username = $1`,
+  verifyUserById: `SELECT id, username FROM users WHERE id = $1`,
 };
