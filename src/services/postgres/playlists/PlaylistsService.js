@@ -8,8 +8,10 @@ const NotFoundError = require('../../../exception/NotFoundError');
 const PermissionError = require('../../../exception/PermissionError');
 
 class PlaylistsService {
-  constructor() {
+  constructor(collaborationsService) {
     this._pool = new Pool();
+
+    this._collaborationsService = collaborationsService;
   }
 
   async addPlaylist({name, owner}) {
@@ -142,6 +144,15 @@ class PlaylistsService {
         });
       });
     });
+  }
+
+  async verifyPlaylistAccess({playlistId, userId}) {
+    try {
+      await this.verifyPlaylistOwner({owner: userId, playlistId});
+    } catch (err) {
+      if (err instanceof InvariantError) throw err;
+      await this._collaborationsService.verifyCollaboration({playlistId, userId});
+    }
   }
 
   async deletePlaylistSongByPlaylistSongId({playlistId, songId}) {

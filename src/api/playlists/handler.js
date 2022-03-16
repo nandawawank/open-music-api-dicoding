@@ -5,7 +5,11 @@ const DeleteResponse = require('../../response/DeleteResponse');
 const NotFoundError = require('../../exception/NotFoundError');
 
 class PlaylistsHandler {
-  constructor(songsService, playlistsService, validator) {
+  constructor(
+      songsService,
+      playlistsService,
+      validator,
+  ) {
     this._songsService = songsService;
     this._playlistsService = playlistsService;
     this._validator = validator;
@@ -63,7 +67,8 @@ class PlaylistsHandler {
       const {songId} = request.payload;
 
       await this._songsService.verifySongId({songId});
-      await this._playlistsService.verifyPlaylistOwner({owner: credentialId, playlistId});
+      await this._playlistsService.verifyPlaylistAccess({playlistId, userId: credentialId});
+
       const playlistSongId = await this._playlistsService.addPlaylistSong({playlistId, songId});
       return h.response({
         status: 'success',
@@ -86,7 +91,7 @@ class PlaylistsHandler {
         return h.response(new NotFoundError('fail', 'Playlist not found'));
       }
 
-      await this._playlistsService.verifyPlaylistOwner({owner: credentialId, playlistId});
+      await this._playlistsService.verifyPlaylistAccess({playlistId, userId: credentialId});
 
       const response = {
         playlist: {

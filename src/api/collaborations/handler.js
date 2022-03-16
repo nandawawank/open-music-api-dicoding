@@ -22,13 +22,19 @@ class CollaborationsHandler {
       this._validator.validatorCollaborationPayload(request.payload);
 
       const {playlistId, userId} = request.payload;
+      const {id: owner} = request.auth.credentials;
 
       await this._usersService.verifyUserById({userId: userId});
       await this._playlistsService.verifyPlaylistById({playlistId});
-      await this._playlistsService.verifyPlaylistOwner({owner: userId, playlistId});
+      await this._playlistsService.verifyPlaylistOwner({owner: owner, playlistId});
 
       const colabirationId = await this._colaborationService.addCollaboration({playlistId, userId});
-      h.response(new PostResponse('success', 201, `Collaboration ${colabirationId} has been added`));
+
+      return h.response(new PostResponse(
+          'success',
+          201,
+          {collaborationId: colabirationId}))
+          .code(201);
     } catch (err) {
       throw err;
     }

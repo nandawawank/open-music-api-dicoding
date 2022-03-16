@@ -4,6 +4,7 @@ const uuid = require('uuid');
 const query = require('./query');
 
 const InvariantError = require('../../../exception/InvariantError');
+const PermissionError = require('../../../exception/PermissionError');
 
 class CollaborationsService {
   constructor() {
@@ -30,6 +31,38 @@ class CollaborationsService {
 
           if (err) return reject(new InvariantError('fail', err.message));
           return resolve(result.rows[0].id);
+        });
+      });
+    });
+  }
+
+  async deleteCollaborations({playlistId, userId}) {
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+
+        client.query(query.deleteCollaborations, [playlistId, userId], (err, result) => {
+          done();
+
+          if (err) return reject(new InvariantError('fail', err.message));
+          // if (result.rowCount === 0) return reject(new NotFoundError())
+        });
+      });
+    });
+  }
+
+  async verifyCollaboration({playlistId, userId}) {
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+
+        client.query(query.verifyCollaboration, [playlistId, userId], (err, result) => {
+          done();
+
+          if (err) return reject(new InvariantError('fail', err.message));
+          if (result.rowCount === 0) return reject(new PermissionError('fail', 'Permission denied'));
+
+          return resolve([]);
         });
       });
     });
