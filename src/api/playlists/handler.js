@@ -84,14 +84,14 @@ class PlaylistsHandler {
       const {id: credentialId} = request.auth.credentials;
       const {playlistId} = request.params;
 
+      await this._playlistsService.verifyPlaylistAccess({playlistId, userId: credentialId});
+
       const playlists = await this._playlistsService.getPlaylistById({playlistId});
       const songs = await this._songsService.getSongByPlaylistId({playlistId});
 
       if (playlists.length < 0) {
         return h.response(new NotFoundError('fail', 'Playlist not found'));
       }
-
-      await this._playlistsService.verifyPlaylistAccess({playlistId, userId: credentialId});
 
       const response = {
         playlist: {
@@ -116,7 +116,7 @@ class PlaylistsHandler {
       const {playlistId} = request.params;
       const {songId} = request.payload;
 
-      await this._playlistsService.verifyPlaylistOwner({owner: credentialId, playlistId});
+      await this._playlistsService.verifyPlaylistAccess({playlistId, userId: credentialId});
       await this._playlistsService.deletePlaylistSongByPlaylistSongId({playlistId, songId});
       return h.response(new DeleteResponse('success', `Song in playlist ${playlistId} has been deleted`));
     } catch (err) {

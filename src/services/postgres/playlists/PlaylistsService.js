@@ -48,7 +48,6 @@ class PlaylistsService {
           done();
 
           if (err) return reject(new InvariantError('fail', err.message));
-          if (result.rowCount === 0) return reject(new NotFoundError('fail', `Playlist for ${owner} not found`));
 
           return resolve(result.rows);
         });

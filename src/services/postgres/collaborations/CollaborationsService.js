@@ -5,6 +5,7 @@ const query = require('./query');
 
 const InvariantError = require('../../../exception/InvariantError');
 const PermissionError = require('../../../exception/PermissionError');
+const NotFoundError = require('../../../exception/NotFoundError');
 
 class CollaborationsService {
   constructor() {
@@ -45,7 +46,9 @@ class CollaborationsService {
           done();
 
           if (err) return reject(new InvariantError('fail', err.message));
-          // if (result.rowCount === 0) return reject(new NotFoundError())
+          if (result.rowCount === 0) return reject(new NotFoundError('fail', 'Playlist and user not found'));
+
+          resolve(result.rows[0].id);
         });
       });
     });
