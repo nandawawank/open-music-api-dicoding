@@ -8,7 +8,7 @@ module.exports = {
       u.username
     FROM playlists p 
     JOIN users u ON u.id = p.owner 
-    JOIN collaborations c ON p.id = c.playlist_id 
+    LEFT JOIN collaborations c ON p.id = c.playlist_id 
     WHERE p.owner  = $1 
     OR c.user_id = $1`,
   getPlaylistById: `SELECT pl.id, pl.name, us.username FROM playlists pl 

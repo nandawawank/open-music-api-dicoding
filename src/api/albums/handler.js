@@ -51,7 +51,7 @@ class AlbumsHandler {
       const album = await this._service.getAlbumById(albumId);
 
       return h.response(
-          new GetResponse('success', 200, {album: album})).code(200);
+          new GetResponse('success', {album: album})).code(200);
     } catch (err) {
       if (err instanceof ClientError) {
         return h.response({

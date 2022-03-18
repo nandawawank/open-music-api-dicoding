@@ -61,7 +61,7 @@ const init = async () => {
 
   // mendefinisikan strategy autentikasi jwt
   server.auth.strategy('musicapp_jwt', 'jwt', {
-    keys: process.env.TOKEN,
+    keys: process.env.ACCESS_TOKEN_KEY,
     verify: {
       aud: false,
       iss: false,

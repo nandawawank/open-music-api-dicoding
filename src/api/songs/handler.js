@@ -28,7 +28,7 @@ class SongsHandler {
       } = request.query;
 
       const songs = await this._service.getAllSongs(title, performer);
-      return h.response(new GetResponse('success', 200, {songs: songs})).code(200);
+      return h.response(new GetResponse('success', {songs: songs})).code(200);
     } catch (err) {
       if (err instanceof ClientError) {
         return h.response({
@@ -52,7 +52,7 @@ class SongsHandler {
       }
 
       const song = await this._service.getSongById(songId);
-      return h.response(new GetResponse('success', 200, {song: song[0]}));
+      return h.response(new GetResponse('success', {song: song[0]}));
     } catch (err) {
       if (err instanceof ClientError) {
         return h.response({

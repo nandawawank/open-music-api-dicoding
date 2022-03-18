@@ -44,13 +44,10 @@ class AuthenticationHandler {
       const {refreshToken} = request.payload;
 
       await this._authenticationService.verifyRefreshToken({refreshToken});
-      const {userId} = this._tokenManager.verifyRefreshToken(refreshToken);
+      const {id: userId} = this._tokenManager.verifyRefreshToken(refreshToken);
 
       const newToken = this._tokenManager.generateToken({userId});
-      const newRefreshToken = this._tokenManager.generateRefreshToken({userId});
-
       await this._authenticationService.addToken({userId, token: newToken});
-      await this._authenticationService.addRefreshToken({userId, refreshToken: newRefreshToken});
 
       return h.response(new PostResponse('success', 200, {accessToken: newToken})).code(200);
     } catch (err) {
@@ -65,7 +62,7 @@ class AuthenticationHandler {
       const {refreshToken} = request.payload;
 
       await this._authenticationService.verifyRefreshToken({refreshToken});
-      const {userId} = this._tokenManager.verifyRefreshToken(refreshToken);
+      const {id: userId} = this._tokenManager.verifyRefreshToken(refreshToken);
 
       await this._authenticationService.deleteToken({userId});
       await this._authenticationService.deleteRefreshToken({userId});

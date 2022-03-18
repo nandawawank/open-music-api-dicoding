@@ -5,7 +5,6 @@ const query = require('./query');
 
 const InvariantError = require('../../../exception/InvariantError');
 const PermissionError = require('../../../exception/PermissionError');
-const NotFoundError = require('../../../exception/NotFoundError');
 
 class CollaborationsService {
   constructor() {
@@ -63,7 +62,7 @@ class CollaborationsService {
           done();
 
           if (err) return reject(new InvariantError('fail', err.message));
-          if (result.rowCount === 0) return reject(new PermissionError('fail', 'Permission denied'));
+          if (!result.rowCount) return reject(new PermissionError('fail', 'Collaborations not found'));
 
           return resolve([]);
         });

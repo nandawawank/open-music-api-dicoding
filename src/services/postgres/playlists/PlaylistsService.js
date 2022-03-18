@@ -121,7 +121,8 @@ class PlaylistsService {
           done();
 
           if (err) return reject(new InvariantError('fail', err.message));
-          if (result.rowCount === 0) return reject(new PermissionError('fail', `Permission denied`));
+          if (!result.rowCount) return reject(new PermissionError('fail', `Permission Denied`));
+
           return resolve([]);
         });
       });
