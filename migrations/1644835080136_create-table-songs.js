@@ -1,28 +1,6 @@
 /* eslint-disable camelcase */
-exports.up = (pgm) => {
-  pgm.createTable('albums', {
-    id: {
-      type: 'VARCHAR(50)',
-      primaryKey: true,
-    },
-    name: {
-      type: 'VARCHAR(100)',
-      notNull: true,
-    },
-    year: {
-      type: 'INTEGER',
-      notNull: true,
-    },
-    create_at: {
-      type: 'TIMESTAMP',
-      notNull: true,
-    },
-    update_at: {
-      type: 'TIMESTAMP',
-      notNull: true,
-    },
-  });
 
+exports.up = (pgm) => {
   pgm.createTable('songs', {
     id: {
       type: 'VARCHAR(50)',
@@ -61,9 +39,14 @@ exports.up = (pgm) => {
       notNull: true,
     },
   });
+
+  pgm.addConstraint(
+      'songs',
+      'fk_albums_album_id',
+      'FOREIGN KEY (album_id) REFERENCES albums(id) ON DELETE CASCADE',
+  );
 };
 
 exports.down = (pgm) => {
-  pgm.dropTable('albums');
   pgm.dropTable('songs');
 };
