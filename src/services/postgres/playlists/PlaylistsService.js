@@ -117,11 +117,23 @@ class PlaylistsService {
       this._pool.connect((err, client, done) => {
         if (err) return reject(new InvariantError('fail', err.message));
 
-        client.query(query.verifyPlaylistOwner, [playlistId, owner], (err, result) => {
+        client.query(query.verifyPlaylistOwner, [playlistId], (err, result) => {
           done();
 
           if (err) return reject(new InvariantError('fail', err.message));
-          if (!result.rowCount) return reject(new PermissionError('fail', `Permission Denied`));
+
+          if (!result.rowCount) {
+            return reject(new NotFoundError('fail', 'Playlist tidak ditemukan'));
+          }
+
+          const playlist = result.rows[0];
+
+          if (playlist.owner !== owner) {
+            return reject(new PermissionError(
+                'fail',
+                'Anda tidak berhak mengakses resource ini',
+            ));
+          }
 
           return resolve([]);
         });
@@ -150,8 +162,12 @@ class PlaylistsService {
     try {
       await this.verifyPlaylistOwner({owner: userId, playlistId});
     } catch (err) {
-      if (err instanceof InvariantError) throw err;
-      await this._collaborationsService.verifyCollaboration({playlistId, userId});
+      if (err instanceof NotFoundError) throw err;
+      try {
+        await this._collaborationsService.verifyCollaboration({playlistId, userId});
+      } catch {
+        throw err;
+      }
     }
   }
 

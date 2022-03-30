@@ -19,11 +19,13 @@
   "dependencies": {
     "@hapi/hapi": "^20.2.1",
     "@hapi/jwt": "^2.1.0",
+    "amqplib": "^0.8.0",
     "bcrypt": "^5.0.1",
     "dotenv": "^16.0.0",
     "joi": "^17.6.0",
     "nanoid": "^3.2.0",
     "node-pg-migrate": "^6.2.1",
+    "nodemailer": "^6.7.3",
     "pg": "^8.7.3",
     "uuid": "^8.3.2"
   }

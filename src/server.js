@@ -11,6 +11,7 @@ const users = require('./api/users');
 const authentications = require('./api/authentications');
 const playlists = require('./api/playlists');
 const collaborations = require('./api/collaborations');
+const exportPlaylist = require('./api/export');
 
 const TokenManager = require('./tokenize/TokenManager');
 
@@ -31,6 +32,8 @@ const PlaylistsValidator = require('./validator/playlists/index');
 
 const CollaborationsService = require('./services/postgres/collaborations/CollaborationsService');
 const CollaboratorsValidator = require('./validator/collaborations/index');
+
+const ExportsPlaylistValidator = require('./validator/export/index');
 
 const ClientError = require('./exception/ClientError');
 
@@ -123,6 +126,13 @@ const init = async () => {
         usersService,
         collaborationsService,
         validator: CollaboratorsValidator,
+      },
+    },
+    {
+      plugin: exportPlaylist,
+      options: {
+        playlistsService,
+        validator: ExportsPlaylistValidator,
       },
     },
   ]);

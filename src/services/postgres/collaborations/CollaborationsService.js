@@ -4,7 +4,6 @@ const uuid = require('uuid');
 const query = require('./query');
 
 const InvariantError = require('../../../exception/InvariantError');
-const PermissionError = require('../../../exception/PermissionError');
 
 class CollaborationsService {
   constructor() {
@@ -62,7 +61,7 @@ class CollaborationsService {
           done();
 
           if (err) return reject(new InvariantError('fail', err.message));
-          if (!result.rowCount) return reject(new PermissionError('fail', 'Collaborations not found'));
+          if (!result.rowCount) return reject(new InvariantError('fail', 'Collaborations not found'));
 
           return resolve([]);
         });
