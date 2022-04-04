@@ -30,8 +30,21 @@ const mapObjectToCollaborationModel = ({
   collab_id: id,
 });
 
+const mapObjectToAlbumModel = ({
+  id,
+  name,
+  year,
+  cover_url,
+}) => ({
+  id,
+  name,
+  year,
+  coverUrl: cover_url,
+});
+
 module.exports = {
   objectIsEmpty,
   mapObjectToSongModel,
   mapObjectToCollaborationModel,
+  mapObjectToAlbumModel,
 };

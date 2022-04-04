@@ -8,21 +8,23 @@ const PutResponse = require('../../response/PutResponse');
 const GetResponse = require('../../response/GetResponse');
 
 class AlbumsHandler {
-  constructor(service, validator) {
-    this._service = service;
+  constructor(albumsService, storageService, validator) {
+    this._albumsService = albumsService;
+    this._storageService = storageService;
     this._validator = validator;
 
     this.postAlbumHandler = this.postAlbumHandler.bind(this);
     this.getAlbumByIdHandler = this.getAlbumByIdHandler.bind(this);
     this.putAlbumByIdHandler = this.putAlbumByIdHandler.bind(this);
     this.deleteAlbumByIdHandler = this.deleteAlbumByIdHandler.bind(this);
+    this.postCoverAlbumHandler = this.postCoverAlbumHandler.bind(this);
   }
 
   async postAlbumHandler(request, h) {
     try {
       this._validator.validatorAlbumPayload(request.payload);
 
-      const albumsId = await this._service.addAlbum(request.payload);
+      const albumsId = await this._albumsService.addAlbum(request.payload);
 
       return h.response(
           new PostResponse('success', 201, {albumId: albumsId})).code(201);
@@ -48,7 +50,7 @@ class AlbumsHandler {
             new InvariantError('fail', 'id is required').code(400));
       }
 
-      const album = await this._service.getAlbumById(albumId);
+      const album = await this._albumsService.getAlbumById(albumId);
 
       return h.response(
           new GetResponse('success', {album: album})).code(200);
@@ -73,7 +75,7 @@ class AlbumsHandler {
       const {albumId} = request.params;
       if (!albumId) return h.response(new InvariantError('fail', 'id is required'));
 
-      const id = await this._service.editAlbumById(albumId, request.payload);
+      const id = await this._albumsService.editAlbumById(albumId, request.payload);
 
       return h.response(
           new PutResponse(
@@ -99,7 +101,7 @@ class AlbumsHandler {
       const {albumId} = request.params;
       if (!albumId) return h.response(new InvariantError('fail', 'id is required'));
 
-      const id = await this._service.deleteAlbumById(albumId);
+      const id = await this._albumsService.deleteAlbumById(albumId);
 
       return h.response({
         status: 'success',
@@ -117,6 +119,28 @@ class AlbumsHandler {
 
       // SERVER ERROR
       return h.response(new InvariantError('fail', err)).code(500);
+    }
+  }
+
+  async postCoverAlbumHandler(request, h) {
+    try {
+      const {cover} = request.payload;
+      this._validator.validatorImageHeader(cover.hapi.headers);
+
+      const fileLocation = await this._storageService.writeFile(
+          cover,
+          cover.hapi,
+      );
+      console.log('fileLocation, ', fileLocation);
+
+      const response = h.response({
+        status: 'success',
+        message: 'Sampul berhasil diunggah',
+      });
+      response.code(201);
+      return response;
+    } catch (err) {
+      throw err;
     }
   }
 }

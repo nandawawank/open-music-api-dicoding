@@ -1,4 +1,7 @@
-const AlbumPayloadSchema = require('./schema');
+const {
+  AlbumPayloadSchema,
+  ImageHeaderSchema,
+} = require('./schema');
 const InvariantError = require('../../exception/InvariantError');
 
 const AlbumValidator = {
@@ -9,6 +12,13 @@ const AlbumValidator = {
       throw new InvariantError('fail', validationResult.error.message);
     }
   },
+  validatorImageHeader: (header) => {
+    const validationResult = ImageHeaderSchema.validate(header);
+
+    if (validationResult.error) {
+      throw new InvariantError('fail', validationResult.error.message);
+    }
+  },
 };
 
-module.exports =AlbumValidator;
+module.exports = AlbumValidator;
