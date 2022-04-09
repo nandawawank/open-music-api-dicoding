@@ -8,6 +8,8 @@ const NotFoundError = require('../../../exception/NotFoundError');
 const query = require('./query');
 const SongsService = require('../../../services/postgres/songs/SongsService');
 
+const CacheService = require('../../redis/CacheService');
+
 const {
   objectIsEmpty,
   mapObjectToAlbumModel,
@@ -16,6 +18,7 @@ class AlbumsService {
   constructor() {
     this._pool = new pg.Pool();
     this._songsService = new SongsService();
+    this._cacheService = new CacheService();
   }
 
   async getAlbumById(id) {
@@ -118,6 +121,83 @@ class AlbumsService {
 
           if (err) return reject(new InvariantError('fail', err.message));
           return resolve(result.rows[0].id);
+        });
+      });
+    });
+  }
+
+  async getAlbumLike({albumId}) {
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+
+        client.query(query.getAlbumLike, [albumId], (err, result) => {
+          done();
+
+          if (err) return reject(new InvariantError('fail', err.message));
+
+          return resolve(parseInt(result.rows[0].like));
+        });
+      });
+    });
+  }
+
+  async verifyLike({albumId, userId}) {
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+
+        client.query(
+            query.getAlbumLikeByAlbumIdAndUserId,
+            [albumId, userId],
+            (err, result) => {
+              done();
+
+              if (err) return reject(new InvariantError('fail', err.message));
+              if (result.rowCount === 0) return resolve(0);
+              return resolve(result.rows[0].id);
+            });
+      });
+    });
+  }
+
+  async addLikeAlbum({albumId, userId}) {
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+        const likeId = `like-album-${uuid.v4()}`;
+
+        client.query(query.addLikeAlbum, [likeId, userId, albumId], async (err, result) => {
+          done();
+
+          const like = await this.getAlbumLike({albumId});
+          this._cacheService.set('like', like)
+              .catch((errCache) => {
+                throw reject(errCache);
+              });
+
+          if (err) return reject(new InvariantError('fail', err.message));
+          return resolve(result.rows);
+        });
+      });
+    });
+  }
+
+  async deleteLikeAlbum({likeId}) {
+    return new Promise((resolve, reject) => {
+      this._pool.connect((err, client, done) => {
+        if (err) return reject(new InvariantError('fail', err.message));
+
+        client.query(query.deleteLikeAlbum, [likeId], (err, result) => {
+          done();
+
+          this._cacheService.delete('like')
+              .catch((errCache) => {
+                throw reject(errCache);
+              });
+
+          if (err) return reject(new InvariantError('fail', err.message));
+          return resolve(result);
         });
       });
     });

@@ -38,6 +38,7 @@ const CollaboratorsValidator = require('./validator/collaborations/index');
 const ExportsPlaylistValidator = require('./validator/export/index');
 
 const StorageService = require('./services/storage/StorageService');
+const CacheService = require('./services/redis/CacheService');
 
 const ClientError = require('./exception/ClientError');
 
@@ -49,6 +50,7 @@ const init = async () => {
   const authenticationsService = new AuthenticationsService();
   const collaborationsService = new CollaborationsService();
   const playlistsService = new PlaylistsService(collaborationsService);
+  const cacheService = new CacheService();
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -93,6 +95,7 @@ const init = async () => {
       options: {
         albumsService,
         storageService,
+        cacheService,
         validator: AlbumsValidator,
       },
     },
