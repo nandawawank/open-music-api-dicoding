@@ -171,7 +171,7 @@ class AlbumsService {
           done();
 
           const like = await this.getAlbumLike({albumId});
-          this._cacheService.set('like', like)
+          this._cacheService.set(`${albumId}:like`, like, 1800)
               .catch((errCache) => {
                 throw reject(errCache);
               });
@@ -183,7 +183,7 @@ class AlbumsService {
     });
   }
 
-  async deleteLikeAlbum({likeId}) {
+  async deleteLikeAlbum({albumId, likeId}) {
     return new Promise((resolve, reject) => {
       this._pool.connect((err, client, done) => {
         if (err) return reject(new InvariantError('fail', err.message));
@@ -191,7 +191,7 @@ class AlbumsService {
         client.query(query.deleteLikeAlbum, [likeId], (err, result) => {
           done();
 
-          this._cacheService.delete('like')
+          this._cacheService.delete(`${albumId}:like`)
               .catch((errCache) => {
                 throw reject(errCache);
               });

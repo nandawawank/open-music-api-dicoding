@@ -1,5 +1,6 @@
 module.exports = {
-  addAlbum: `INSERT INTO albums VALUES ($1,$2,$3,$4,$5) RETURNING id`,
+  addAlbum: `INSERT INTO albums (id, name, year, create_at, update_at) 
+  VALUES ($1,$2,$3,$4,$5) RETURNING id`,
   addLikeAlbum: `INSERT INTO user_album_likes VALUES ($1,$2,$3) RETURNING id`,
   getAlbum: `SELECT id, name, year, cover_url FROM albums 
   WHERE id = $1`,

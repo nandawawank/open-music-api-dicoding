@@ -170,7 +170,7 @@ class AlbumsHandler {
           message: 'Berhasil menyukai album',
         }).code(201);
       } else {
-        await this._albumsService.deleteLikeAlbum({likeId: idLike});
+        await this._albumsService.deleteLikeAlbum({albumId, likeId: idLike});
         return h.response({
           status: 'success',
           message: 'Tidak menyukai album',
