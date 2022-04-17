@@ -136,7 +136,7 @@ class AlbumsHandler {
           cover.hapi,
       );
 
-      const fileLocation = `http://${process.env.HOST}:${process.env.PORT}/album/cover/${filename}`;
+      const fileLocation = `http://${process.env.HOST}:${process.env.PORT}/albums/cover/${filename}`;
 
       try {
         await this._albumsService.addAlbumCover({albumId, coverUrl: fileLocation});
@@ -184,10 +184,19 @@ class AlbumsHandler {
   async getLikeAlbumHandler(request, h) {
     try {
       const {albumId} = request.params;
-      const likeCount = await this._albumsService.getAlbumLike({albumId});
-      const dataCache = await this._cacheService.get('like');
+      const dataCache = await this._cacheService.get(`${albumId}:like`);
 
-      if (dataCache != null) {
+      if (dataCache == null) {
+        const likeCount = await this._albumsService.getAlbumLike({albumId});
+        this._cacheService.set(`${albumId}:like`, likeCount, 1800);
+
+        return h.response({
+          status: 'success',
+          data: {
+            likes: Number(likeCount),
+          },
+        }).code(200);
+      } else {
         return h.response({
           status: 'success',
           data: {
@@ -196,13 +205,6 @@ class AlbumsHandler {
         }).header('X-Data-Source', 'cache')
             .code(200);
       }
-
-      return h.response({
-        status: 'success',
-        data: {
-          likes: likeCount,
-        },
-      }).code(200);
     } catch (err) {
       throw err;
     }

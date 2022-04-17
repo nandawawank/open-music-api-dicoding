@@ -166,6 +166,15 @@ const init = async () => {
       return newResponse;
     }
 
+    if (response instanceof Error) {
+      const newResponse = h.response({
+        status: 'fail',
+        message: response.output.payload.message,
+      });
+      newResponse.code(response.output.statusCode);
+      return newResponse;
+    }
+
     // jika bukan ClientError, lanjutkan dengan
     // response sebelumnya (tanpa terintervensi)
     return response.continue || response;
